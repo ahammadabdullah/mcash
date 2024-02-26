@@ -1,25 +1,34 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import React, { Fragment, useState } from "react";
 
-const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
+const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
   const [fee, setFee] = useState(0);
   function closeModal() {
-    setSendMoneyModalOpen(false);
+    setCashOutModalOpen(false);
     setFee(0);
   }
-  const handleSendMoney = () => {
+  const handleCashOut = () => {
     console.log("Sending Money...");
   };
   const handleFee = (e) => {
     const amount = e.target.value;
-    if (amount > 100) {
-      setFee(5);
-    } else {
-      setFee(0);
-    }
+    const fee = (amount / 100) * 1.5;
+    setFee(fee);
   };
+  const agents = [
+    { name: "John Doe", number: "01830845302" },
+    { name: "Jane Doe", number: "02983890345" },
+    { name: "Alice Smith", number: "01712345678" },
+    { name: "Bob Johnson", number: "01987654321" },
+    { name: "Emily Williams", number: "01654321098" },
+    { name: "David Miller", number: "01512345678" },
+    { name: "Sarah Jones", number: "01478901234" },
+    { name: "Michael Brown", number: "01356789012" },
+    { name: "Jennifer Garcia", number: "01234567890" },
+    { name: "Charles Anderson", number: "01112345678" },
+  ];
   return (
-    <Transition appear show={sendMoneyModalOpen} as={Fragment}>
+    <Transition appear show={cashOutModalOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
         <Transition.Child
           as={Fragment}
@@ -49,25 +58,30 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
                 >
-                  Send Money
+                  Cash Out
                 </Dialog.Title>
                 <form className="space-y-3  my-5">
-                  <label className="text-sm" htmlFor="recipientNumber">
-                    Enter Recipient Number:
+                  <label className="text-sm" htmlFor="agent">
+                    Select Your Agent:
                   </label>
                   <br />
-                  <input
-                    placeholder="01*********"
-                    className="rounded-md border border-gray-300 p-2 !mt-0 !mb-2"
-                    type="number"
-                    name="recipientNumber"
-                    id="recipientNumber"
-                  />
+                  <select
+                    className="rounded-md border border-gray-300 p-2 !mt-0"
+                    id="agent"
+                  >
+                    {agents.map((agent, index) => (
+                      <option key={index} value={agent.number}>
+                        {agent.name} - {agent.number}
+                      </option>
+                    ))}
+                  </select>
+
                   <br />
                   <label className="text-sm" htmlFor="recipientNumber">
                     Enter Amount:
                   </label>
                   <br />
+
                   <input
                     onChange={handleFee}
                     placeholder="Amount in BDT"
@@ -101,7 +115,7 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
                     className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                     onClick={closeModal}
                   >
-                    Send
+                    Cash Out
                   </button>
                 </div>
               </Dialog.Panel>
@@ -112,5 +126,4 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
     </Transition>
   );
 };
-
-export default SendMoneyModal;
+export default CashOutModal;

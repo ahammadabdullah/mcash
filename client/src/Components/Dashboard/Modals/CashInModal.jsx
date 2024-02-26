@@ -1,25 +1,12 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 
-const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
-  const [fee, setFee] = useState(0);
+const CashInModal = ({ cashInModalOpen, setCashInModalOpen }) => {
   function closeModal() {
-    setSendMoneyModalOpen(false);
-    setFee(0);
+    setCashInModalOpen(false);
   }
-  const handleSendMoney = () => {
-    console.log("Sending Money...");
-  };
-  const handleFee = (e) => {
-    const amount = e.target.value;
-    if (amount > 100) {
-      setFee(5);
-    } else {
-      setFee(0);
-    }
-  };
   return (
-    <Transition appear show={sendMoneyModalOpen} as={Fragment}>
+    <Transition appear show={cashInModalOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
         <Transition.Child
           as={Fragment}
@@ -49,40 +36,34 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900"
                 >
-                  Send Money
+                  Cash In
                 </Dialog.Title>
                 <form className="space-y-3  my-5">
                   <label className="text-sm" htmlFor="recipientNumber">
-                    Enter Recipient Number:
+                    Enter User Number:
                   </label>
                   <br />
                   <input
                     placeholder="01*********"
                     className="rounded-md border border-gray-300 p-2 !mt-0 !mb-2"
                     type="number"
-                    name="recipientNumber"
-                    id="recipientNumber"
+                    name="userNumber"
+                    id="userNumber"
                   />
                   <br />
-                  <label className="text-sm" htmlFor="recipientNumber">
+                  <label className="text-sm" htmlFor="amount">
                     Enter Amount:
                   </label>
                   <br />
                   <input
-                    onChange={handleFee}
                     placeholder="Amount in BDT"
-                    className="rounded-md border border-gray-300 p-2 !mt-0 "
+                    className="rounded-md border border-gray-300 p-2 !mt-0  !mb-2"
                     type="number"
                     name="amount"
                     id="amount"
                   />
                   <br />
-                  {fee > 0 && (
-                    <p className=" italic text-sm text-red-600">
-                      Fee: {fee} TK
-                    </p>
-                  )}
-                  <label className="text-sm " htmlFor="recipientNumber">
+                  <label className="text-sm" htmlFor="pin">
                     Enter Your 5 Digit Pin:
                   </label>
                   <br />
@@ -113,4 +94,4 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
   );
 };
 
-export default SendMoneyModal;
+export default CashInModal;
