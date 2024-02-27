@@ -42,10 +42,10 @@ const Login = () => {
 
   return (
     <div>
-      <h3 className="text-2xl mt-10 text-center">Welcome Back</h3>
+      <h3 className="text-2xl text-center">Welcome Back</h3>
       <form
         onSubmit={handleLogin}
-        className="flex flex-col justify-center w-[80%] md:w-[70%] lg:w-[40%] mx-auto lg:p-10"
+        className="flex flex-col justify-center w-[80%]  mx-auto lg:p-10"
       >
         <label htmlFor="number">Number:</label>
         <input

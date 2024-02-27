@@ -9,6 +9,9 @@ import Profile from "../Pages/Dashboard/Profile";
 import Requests from "../Pages/Dashboard/Requests";
 import Users from "../Pages/Dashboard/Users";
 import UserTransactions from "../Pages/Dashboard/UserTransactions";
+import Error from "../Pages/Error";
+import PrivateRoute from "../PrivateRoute/PrivateRoute";
+import AuthRoute from "../PrivateRoute/AuthRoute";
 
 const router = createBrowserRouter([
   {
@@ -21,17 +24,30 @@ const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <Login />,
+        element: (
+          <AuthRoute>
+            <Login />
+          </AuthRoute>
+        ),
       },
       {
         path: "/register",
-        element: <Register />,
+        element: (
+          <AuthRoute>
+            <Register />
+          </AuthRoute>
+        ),
       },
     ],
+    errorElement: <Error />,
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: (
+      <PrivateRoute>
+        <Dashboard />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "",
@@ -50,6 +66,7 @@ const router = createBrowserRouter([
         element: <UserTransactions />,
       },
     ],
+    errorElement: <Error />,
   },
 ]);
 

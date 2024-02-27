@@ -7,12 +7,19 @@ const Profile = () => {
   const { user } = useAuth();
   return (
     <div>
-      <h3 className="text-center text-3xl">
+      <h3 className="text-center text-3xl my-5">
         Welcome to your profile "{user?.name}"
       </h3>
+      <p className="text-center ">{user?.email}</p>
+      <p className="text-center ">{user?.number}</p>
       <BalanceCard />
-      <QuickActions />
-      <TransactionHistory />
+
+      {user.role !== "admin" && (
+        <>
+          <QuickActions />
+          <TransactionHistory />
+        </>
+      )}
     </div>
   );
 };

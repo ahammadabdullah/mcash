@@ -115,6 +115,13 @@ async function run() {
             .send({ success: false, message: "User already logged in" });
           return;
         }
+        if (user.status === "blocked") {
+          res.send({ success: false, message: "User is blocked" });
+          return;
+        }
+        if (user.status === "pending") {
+          res.send({ success: false, message: "User is not verified yet" });
+        }
         if (user.pin === pin) {
           const result = await userCollection.updateOne(
             { number },
@@ -475,6 +482,16 @@ async function run() {
           { _id: new ObjectId(id) },
           { $set: { status: "accepted" } }
         );
+        const transactionDetails = {
+          sender: "admin",
+          receiver: number,
+          amount: 100000,
+          date: new Date(),
+          type: "cash Request",
+        };
+        const transaction = await transactionCollection.insertOne(
+          transactionDetails
+        );
         res.send({ success: true, message: "Request accepted successfully" });
       } catch (error) {
         res.send({ success: false, message: "An error occurred" });
@@ -537,6 +554,16 @@ async function run() {
         const result = await requestCollection.updateOne(
           { _id: new ObjectId(id) },
           { $set: { status: "accepted" } }
+        );
+        const transactionDetails = {
+          sender: agentNumber,
+          receiver: "admin",
+          amount: amount,
+          date: new Date(),
+          type: "WithDraw",
+        };
+        const transaction = await transactionCollection.insertOne(
+          transactionDetails
         );
         res.send({ success: true, message: "Request accepted successfully" });
       } catch (error) {

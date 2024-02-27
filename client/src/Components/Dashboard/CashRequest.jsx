@@ -22,7 +22,7 @@ const CashRequest = () => {
 
   return (
     <div>
-      <Container title={`Cash Request ${data?.length}`}>
+      <Container title={`Cash Request: ${data?.length}`}>
         <div className="overflow-x-auto my-5">
           {data?.length !== 0 ? (
             <Table>

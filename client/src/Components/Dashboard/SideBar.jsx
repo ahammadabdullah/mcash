@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GrLogout } from "react-icons/gr";
-import { FcHome, FcSettings } from "react-icons/fc";
 import { AiOutlineBars } from "react-icons/ai";
-import { BsGraphUp } from "react-icons/bs";
-import { FaHome, FaUser, FaUsers } from "react-icons/fa";
+import { FaUser, FaUsers } from "react-icons/fa";
 import MenuItem from "./MenuItem";
 import useAuth from "../../Hooks/useAuth";
 import toast from "react-hot-toast";
@@ -71,20 +69,24 @@ const SideBar = () => {
             <span onClick={() => setActive(!isActive)}>
               <MenuItem icon={FaUser} label="Dashboard" address="/dashboard" />
             </span>
-            <span onClick={() => setActive(!isActive)}>
-              <MenuItem
-                icon={RiPassPendingFill}
-                label="Requests"
-                address="/dashboard/requests"
-              />
-            </span>
-            <span onClick={() => setActive(!isActive)}>
-              <MenuItem
-                icon={FaUsers}
-                label="Users"
-                address="/dashboard/users"
-              />
-            </span>
+            {user.role === "admin" && (
+              <>
+                <span onClick={() => setActive(!isActive)}>
+                  <MenuItem
+                    icon={RiPassPendingFill}
+                    label="Requests"
+                    address="/dashboard/requests"
+                  />
+                </span>
+                <span onClick={() => setActive(!isActive)}>
+                  <MenuItem
+                    icon={FaUsers}
+                    label="Users"
+                    address="/dashboard/users"
+                  />
+                </span>
+              </>
+            )}
 
             <button
               onClick={handleLogout}

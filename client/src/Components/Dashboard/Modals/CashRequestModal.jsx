@@ -25,6 +25,7 @@ const CashRequestModal = ({
     } else {
       toast.error(res.message);
     }
+    closeModal();
   };
   return (
     <Transition appear show={cashRequestModalOpen} as={Fragment}>

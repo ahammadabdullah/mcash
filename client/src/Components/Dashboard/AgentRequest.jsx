@@ -31,7 +31,7 @@ const AgentRequest = () => {
   };
   return (
     <div>
-      <Container title={`Agent Request ${data?.length}`}>
+      <Container title={`Agent Request: ${data?.length}`}>
         <div className="overflow-x-auto my-5">
           {data?.length !== 0 ? (
             <Table>

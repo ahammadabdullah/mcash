@@ -27,7 +27,7 @@ const WithDrawRequest = () => {
 
   return (
     <div>
-      <Container title={`Withdraw Request ${data?.length}`}>
+      <Container title={`Withdraw Request: ${data?.length}`}>
         <div className="overflow-x-auto my-5">
           {data?.length !== 0 ? (
             <Table>

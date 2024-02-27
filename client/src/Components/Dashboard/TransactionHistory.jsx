@@ -6,6 +6,7 @@ import useGetTransactions from "../../Hooks/useGetTransactions";
 const TransactionHistory = () => {
   const { user } = useAuth();
   const [transactions, refetch] = useGetTransactions();
+  console.log(transactions);
   return (
     <div className="my-10">
       <h3 className="text-center text-3xl py-3">Transaction History:</h3>

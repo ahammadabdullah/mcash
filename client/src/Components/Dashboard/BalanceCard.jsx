@@ -13,8 +13,8 @@ const BalanceCard = () => {
   };
   return (
     <div>
-      <div className="w-fit flex items-center gap-5">
-        <h3>Total Balance: </h3>
+      <div className="w-fit flex items-center gap-5 mx-auto mt-10">
+        <h3 className="">Total Balance: </h3>
         <div className="relative py-1 px-2 ">
           <div
             className={`absolute inset-0 bg-gray-300 opacity-100 backdrop-blur-3xl blur-2 filter grayscale pointer-events-none  rounded-lg  ${
@@ -34,7 +34,7 @@ const BalanceCard = () => {
         </div>
       </div>
       {user?.role !== "user" && (
-        <div className="w-fit flex items-center gap-5">
+        <div className="w-fit flex items-center gap-5 mx-auto mt-10">
           <h3>Total Income: </h3>
           <div className="relative py-1 px-2 ">
             <div
