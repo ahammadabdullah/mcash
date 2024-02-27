@@ -3,9 +3,13 @@ import { Fragment, useState } from "react";
 import useAuth from "../../../Hooks/useAuth";
 import { sendMoney } from "../../../lib/apis";
 import toast from "react-hot-toast";
+import useGetUserInfos from "../../../Hooks/useGetUserInfos";
+import useGetTransactions from "../../../Hooks/useGetTransactions";
 
 const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
   const [fee, setFee] = useState(0);
+  const [data, balanceRefetch] = useGetUserInfos();
+  const [transactions, transactionRefetch] = useGetTransactions();
   const { user } = useAuth();
   function closeModal() {
     setSendMoneyModalOpen(false);
@@ -33,6 +37,8 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
     } else {
       toast.error(res.message);
     }
+    balanceRefetch();
+    transactionRefetch();
     console.log(res);
   };
   const handleFee = (e) => {

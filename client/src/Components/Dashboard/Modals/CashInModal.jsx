@@ -1,10 +1,39 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment } from "react";
+import useGetUserInfos from "../../../Hooks/useGetUserInfos";
+import useGetTransactions from "../../../Hooks/useGetTransactions";
+import useAuth from "../../../Hooks/useAuth";
+import { cashIn } from "../../../lib/apis";
+import toast from "react-hot-toast";
 
 const CashInModal = ({ cashInModalOpen, setCashInModalOpen }) => {
   function closeModal() {
     setCashInModalOpen(false);
   }
+  const [data, balanceRefetch] = useGetUserInfos();
+  const [transactions, transactionRefetch] = useGetTransactions();
+  const { user } = useAuth();
+
+  const handleCashIn = async (e) => {
+    e.preventDefault();
+    const amount = e.target.amount.value;
+    const userNumber = e.target.userNumber.value;
+    const pin = e.target.pin.value;
+    const info = {
+      amount,
+      userNumber,
+      pin,
+      agentNumber: user.number,
+    };
+    const res = await cashIn(info);
+    if (res.success === true) {
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
+    }
+    balanceRefetch();
+    transactionRefetch();
+  };
   return (
     <Transition appear show={cashInModalOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -38,7 +67,7 @@ const CashInModal = ({ cashInModalOpen, setCashInModalOpen }) => {
                 >
                   Cash In
                 </Dialog.Title>
-                <form className="space-y-3  my-5">
+                <form onSubmit={handleCashIn} className="space-y-3  my-5">
                   <label className="text-sm" htmlFor="recipientNumber">
                     Enter User Number:
                   </label>
@@ -74,17 +103,16 @@ const CashInModal = ({ cashInModalOpen, setCashInModalOpen }) => {
                     name="pin"
                     id="pin"
                   />
+                  <div className="mt-4">
+                    <button
+                      type="submit"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={closeModal}
+                    >
+                      Send
+                    </button>
+                  </div>
                 </form>
-
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    onClick={closeModal}
-                  >
-                    Send
-                  </button>
-                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

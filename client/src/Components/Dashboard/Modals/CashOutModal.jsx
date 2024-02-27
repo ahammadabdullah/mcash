@@ -12,7 +12,6 @@ const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
   const [agents, refetch] = getAgents();
   const [data, balanceRefetch] = useGetUserInfos();
   const [transactions, transactionRefetch] = useGetTransactions();
-
   const { user } = useAuth();
   function closeModal() {
     setCashOutModalOpen(false);
@@ -86,7 +85,7 @@ const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
                   </label>
                   <br />
                   <select
-                    className="rounded-md border border-gray-300 p-2 !mt-0"
+                    className="rounded-md border border-gray-300 p-2 px-8 !mt-0"
                     name="agent"
                     id="agent"
                   >

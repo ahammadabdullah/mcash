@@ -10,14 +10,24 @@ const TransactionHistory = () => {
     <div className="my-10">
       <h3 className="text-center text-3xl py-3">Transaction History:</h3>
 
-      <div className="overflow-x-auto ">
-        <Table>
+      <div className="overflow-x-auto w-fit mx-auto ">
+        <Table className="">
           <Table.Head>
-            <Table.HeadCell>Date & Time</Table.HeadCell>
-            <Table.HeadCell>Sender</Table.HeadCell>
-            <Table.HeadCell>Receiver</Table.HeadCell>
-            <Table.HeadCell>Amount</Table.HeadCell>
-            <Table.HeadCell>Type</Table.HeadCell>
+            <Table.HeadCell className="pr-2 md:pr-5 lg:pr-12">
+              Date & Time
+            </Table.HeadCell>
+            <Table.HeadCell className="pr-2 md:pr-5 lg:pr-12">
+              Sender
+            </Table.HeadCell>
+            <Table.HeadCell className="pr-2 md:pr-5 lg:pr-12">
+              Receiver
+            </Table.HeadCell>
+            <Table.HeadCell className="pr-2 md:pr-5 lg:pr-12">
+              Amount
+            </Table.HeadCell>
+            <Table.HeadCell className="pr-2 md:pr-5 lg:pr-12">
+              Type
+            </Table.HeadCell>
           </Table.Head>
           <Table.Body className="divide-y">
             {transactions &&
@@ -26,7 +36,7 @@ const TransactionHistory = () => {
                   key={index}
                   className="bg-white  whitespace-nowrap font-medium text-gray-900 text-center"
                 >
-                  <Table.Cell className="pr-2">
+                  <Table.Cell className="pr-2 md:pr-5 lg:pr-12">
                     {new Date(transaction.date).toLocaleDateString("en-US", {
                       year: "numeric",
                       month: "short",
@@ -35,11 +45,13 @@ const TransactionHistory = () => {
                       minute: "2-digit",
                     })}
                   </Table.Cell>
-                  <Table.Cell className="pr-2">{transaction.sender}</Table.Cell>
-                  <Table.Cell className="pr-2">
+                  <Table.Cell className="pr-2 md:pr-5 lg:pr-12">
+                    {transaction.sender}
+                  </Table.Cell>
+                  <Table.Cell className="pr-2 md:pr-5 lg:pr-12">
                     {transaction.receiver}
                   </Table.Cell>
-                  <Table.Cell className="pr-2">
+                  <Table.Cell className="pr-2 md:pr-5 lg:pr-12">
                     ${transaction.amount}
                   </Table.Cell>
                   <Table.Cell>{transaction.type}</Table.Cell>

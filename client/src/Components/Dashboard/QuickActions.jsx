@@ -2,11 +2,16 @@ import { useState } from "react";
 import SendMoneyModal from "./Modals/SendMoneyModal";
 import CashInModal from "./Modals/CashInModal";
 import CashOutModal from "./Modals/CashOutModal";
+import CashRequestModal from "./Modals/CashRequestModal";
+import WithdrawRequestModal from "./Modals/WithdrawRequestModal";
 
 const QuickActions = () => {
   const [sendMoneyModalOpen, setSendMoneyModalOpen] = useState(false);
   const [cashInModalOpen, setCashInModalOpen] = useState(false);
-  const [cashOutModalOpen, setCashOutModalOpen] = useState(false); //
+  const [cashOutModalOpen, setCashOutModalOpen] = useState(false);
+  const [cashRequestModalOpen, setCashRequestModalOpen] = useState(false);
+  const [withdrawRequestModalOpen, setWithdrawRequestModalOpen] =
+    useState(false);
 
   return (
     <>
@@ -26,7 +31,7 @@ const QuickActions = () => {
           >
             Cash Out
           </button>
-
+          {/* cash in for agent */}
           <button
             onClick={() => setCashInModalOpen(!cashInModalOpen)}
             className="w-[100px] bg-green-500 text-white p-2 rounded-lg"
@@ -34,11 +39,19 @@ const QuickActions = () => {
             Cash in
           </button>
           {/* cash request for agent */}
-          <button className="w-[100px] bg-green-500 text-white p-2 rounded-lg">
+          <button
+            onClick={() => setCashRequestModalOpen(!cashRequestModalOpen)}
+            className="w-[100px] bg-green-500 text-white p-2 rounded-lg"
+          >
             Cash Request
           </button>
           {/* withdraw request for agent */}
-          <button className="w-[100px] bg-green-500 text-white p-2 rounded-lg">
+          <button
+            onClick={() =>
+              setWithdrawRequestModalOpen(!withdrawRequestModalOpen)
+            }
+            className="w-[100px] bg-green-500 text-white p-2 rounded-lg"
+          >
             Withdraw Request
           </button>
         </div>
@@ -55,6 +68,14 @@ const QuickActions = () => {
       <CashOutModal
         cashOutModalOpen={cashOutModalOpen}
         setCashOutModalOpen={setCashOutModalOpen}
+      />
+      <CashRequestModal
+        cashRequestModalOpen={cashRequestModalOpen}
+        setCashRequestModalOpen={setCashRequestModalOpen}
+      />
+      <WithdrawRequestModal
+        withdrawRequestModalOpen={withdrawRequestModalOpen}
+        setWithdrawRequestModalOpen={setWithdrawRequestModalOpen}
       />
     </>
   );

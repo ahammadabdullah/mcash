@@ -60,3 +60,8 @@ export const cashOut = async (info) => {
   const { data } = await axiosSecure.post("/cashOut", info);
   return data;
 };
+
+export const cashIn = async (info) => {
+  const { data } = await axiosSecure.post("/cashIn", info);
+  return data;
+};

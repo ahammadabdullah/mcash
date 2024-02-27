@@ -266,6 +266,43 @@ async function run() {
       res.send({ success: true, message: "Cash out successful" });
     });
 
+    // cash in to user
+
+    app.post("/v1/cashIn", async (req, res) => {
+      const info = req.body;
+      const amount = parseInt(info.amount);
+      const agent = await userCollection.findOne({ number: info.agentNumber });
+      const user = await userCollection.findOne({ number: info.userNumber });
+      if (agent.pin !== info.pin) {
+        res.send({ success: false, message: "Wrong pin" });
+        return;
+      }
+      if (user.role !== "user") {
+        res.send({ success: false, message: "user not found" });
+        return;
+      }
+      if (agent.balance < info.amount) {
+        res.send({ success: false, message: "Insufficient balance" });
+        return;
+      }
+      const sent = await userCollection.updateOne(
+        { number: info.agentNumber },
+        { $inc: { balance: -amount } }
+      );
+      const received = await userCollection.updateOne(
+        { number: info.userNumber },
+        { $inc: { balance: amount } }
+      );
+      const transactionDetails = {
+        sender: info.agentNumber,
+        receiver: info.userNumber,
+        amount: info.amount,
+        date: new Date(),
+        type: "cash in",
+      };
+      const result = await transactionCollection.insertOne(transactionDetails);
+      res.send({ success: true, message: "Cash in successful" });
+    });
     // get user transaction details
     app.get("/v1/userTransactions/:number", async (req, res) => {
       const userNumber = req.params.number;
