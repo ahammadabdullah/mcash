@@ -7,6 +7,8 @@ import Dashboard from "../Layouts/Dashboard";
 import Register from "../Pages/Register/Register";
 import Profile from "../Pages/Dashboard/Profile";
 import Requests from "../Pages/Dashboard/Requests";
+import Users from "../Pages/Dashboard/Users";
+import UserTransactions from "../Pages/Dashboard/UserTransactions";
 
 const router = createBrowserRouter([
   {
@@ -38,6 +40,14 @@ const router = createBrowserRouter([
       {
         path: "requests",
         element: <Requests />,
+      },
+      {
+        path: "users",
+        element: <Users />,
+      },
+      {
+        path: "userTransactions/:number",
+        element: <UserTransactions />,
       },
     ],
   },

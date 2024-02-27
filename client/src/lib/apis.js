@@ -17,7 +17,6 @@ export const logout = async (number) => {
 };
 
 export const sendMoney = async (info) => {
-  console.log("hiiting", info);
   const { data } = await axiosSecure.post("/sendMoney", info);
   return data;
 };
@@ -63,5 +62,37 @@ export const cashOut = async (info) => {
 
 export const cashIn = async (info) => {
   const { data } = await axiosSecure.post("/cashIn", info);
+  return data;
+};
+
+export const getTotalBalance = async () => {
+  const { data } = await axiosSecure.get("/totalBalance");
+  return data;
+};
+
+export const getAllUser = async () => {
+  const { data } = await axiosSecure.get("/allUsers");
+  return data;
+};
+
+export const userAction = async (id) => {
+  const { data } = await axiosSecure.put(`/userAction/${id}`);
+  return data;
+};
+
+export const cashRequest = async (info) => {
+  const { data } = await axiosSecure.post("/cashRequest", info);
+  return data;
+};
+
+export const getCashRequests = async () => {
+  const { data } = await axiosSecure.get("/cashRequestsForAdmin");
+  return data;
+};
+
+export const acceptCashRequest = async (id, agentNumber) => {
+  const { data } = await axiosSecure.put(`/acceptCashRequest/${id}`, {
+    number: agentNumber,
+  });
   return data;
 };

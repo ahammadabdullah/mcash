@@ -4,7 +4,7 @@ import { GrLogout } from "react-icons/gr";
 import { FcHome, FcSettings } from "react-icons/fc";
 import { AiOutlineBars } from "react-icons/ai";
 import { BsGraphUp } from "react-icons/bs";
-import { FaHome, FaUser } from "react-icons/fa";
+import { FaHome, FaUser, FaUsers } from "react-icons/fa";
 import MenuItem from "./MenuItem";
 import useAuth from "../../Hooks/useAuth";
 import toast from "react-hot-toast";
@@ -76,6 +76,13 @@ const SideBar = () => {
                 icon={RiPassPendingFill}
                 label="Requests"
                 address="/dashboard/requests"
+              />
+            </span>
+            <span onClick={() => setActive(!isActive)}>
+              <MenuItem
+                icon={FaUsers}
+                label="Users"
+                address="/dashboard/users"
               />
             </span>
 

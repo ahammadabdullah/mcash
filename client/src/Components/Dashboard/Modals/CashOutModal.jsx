@@ -26,7 +26,6 @@ const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
 
   const handleCashOut = async (e) => {
     e.preventDefault();
-    console.log("Cash Out");
     const amount = e.target.amount.value;
     const agentNumber = e.target.agent.value;
     const pin = e.target.pin.value;
@@ -42,7 +41,6 @@ const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
     } else {
       toast.error(res.message);
     }
-    console.log(res);
     balanceRefetch();
     transactionRefetch();
   };

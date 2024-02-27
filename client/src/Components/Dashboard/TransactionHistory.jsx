@@ -11,7 +11,7 @@ const TransactionHistory = () => {
       <h3 className="text-center text-3xl py-3">Transaction History:</h3>
 
       <div className="overflow-x-auto w-fit mx-auto ">
-        <Table className="">
+        <Table>
           <Table.Head>
             <Table.HeadCell className="pr-2 md:pr-5 lg:pr-12">
               Date & Time

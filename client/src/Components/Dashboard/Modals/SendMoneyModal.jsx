@@ -15,7 +15,6 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
     setSendMoneyModalOpen(false);
     setFee(0);
   }
-  // TODO: minimum sent amount is 50 tk.
   const handleSendMoney = async (e) => {
     e.preventDefault();
     const amount = e.target.amount.value;
@@ -27,6 +26,10 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
       receiver,
       pin,
     };
+    if (amount < 50) {
+      toast.error("You can't send less than 50 TK");
+      return;
+    }
     if (user.number === receiver) {
       toast.error("You can't send money to yourself");
       return;
@@ -39,7 +42,6 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
     }
     balanceRefetch();
     transactionRefetch();
-    console.log(res);
   };
   const handleFee = (e) => {
     const amount = e.target.value;

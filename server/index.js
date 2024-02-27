@@ -55,10 +55,11 @@ async function run() {
     // collections
     const userCollection = client.db("mCash").collection("users");
     const transactionCollection = client.db("mCash").collection("transactions");
+    const requestCollection = client.db("mCash").collection("requests");
 
     // registration api
     app.post("/v1/register", async (req, res) => {
-      const { email, pin, name, number, role } = req.body;
+      const { email, pin, name, number, role, NID } = req.body;
       const filter = { $or: [{ email }, { number }] };
       const user = await userCollection.findOne(filter);
       let balance = 0;
@@ -76,6 +77,7 @@ async function run() {
         }
         const newUser = await userCollection.insertOne({
           email,
+          NID,
           pin,
           name,
           number,
@@ -162,7 +164,7 @@ async function run() {
     // get user by number api
     app.get("/v1/users/:number", async (req, res) => {
       const projection = {
-        password: 0,
+        pin: 0,
       };
       const result = await userCollection.findOne(
         {
@@ -173,6 +175,50 @@ async function run() {
       res.status(200).send(result);
     });
 
+    // get all users for admin
+
+    app.get("/v1/allUsers", async (req, res) => {
+      const filter = {
+        $and: [
+          { $or: [{ role: "user" }, { role: "agent" }] },
+          { status: { $ne: "pending" } },
+        ],
+      };
+      const projection = {
+        pin: 0,
+        balance: 0,
+      };
+      const result = await userCollection
+        .find(filter, projection)
+        .sort({ role: 1 })
+        .toArray();
+      res.send(result);
+    });
+
+    // user bblock unblock action for admin
+    try {
+      app.put("/v1/userAction/:id", async (req, res) => {
+        const id = req.params.id;
+        const user = await userCollection.findOne({ _id: new ObjectId(id) });
+        if (user.status === "verified") {
+          const result = await userCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: { status: "blocked" } }
+          );
+        } else {
+          const result = await userCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $set: { status: "verified" } }
+          );
+        }
+        res.send({
+          success: true,
+          message: "User status updated Successfully",
+        });
+      });
+    } catch (error) {
+      res.send({ success: false, message: "Something Went Wrong" });
+    }
     // send money user to user
     app.post("/v1/sendMoney", async (req, res) => {
       const info = req.body;
@@ -217,7 +263,6 @@ async function run() {
       };
       const result = await transactionCollection.insertOne(transactionDetails);
       res.send({ success: true, message: "Money sent successfully" });
-      console.log(result);
     });
 
     // cash out to agents
@@ -265,7 +310,6 @@ async function run() {
       const result = await transactionCollection.insertOne(transactionDetails);
       res.send({ success: true, message: "Cash out successful" });
     });
-
     // cash in to user
 
     app.post("/v1/cashIn", async (req, res) => {
@@ -332,22 +376,30 @@ async function run() {
 
     // approve agent
     app.put("/v1/approveAgent/:id", async (req, res) => {
-      const id = req.params.id;
-      const result = await userCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: { status: "verified" } }
-      );
-      res.send({ success: true, message: "Agent approved successfully" });
+      try {
+        const id = req.params.id;
+        const result = await userCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { status: "verified" } }
+        );
+        res.send({ success: true, message: "Agent approved successfully" });
+      } catch (error) {
+        res.status(500).send({ success: false, message: "An error occurred" });
+      }
     });
     // decline agent
 
     app.put("/v1/declineAgent/:id", async (req, res) => {
-      const id = req.params.id;
-      const result = await userCollection.updateOne(
-        { _id: new ObjectId(id) },
-        { $set: { status: "declined" } }
-      );
-      res.send({ success: true, message: "Agent declined successfully" });
+      try {
+        const id = req.params.id;
+        const result = await userCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { status: "declined" } }
+        );
+        res.send({ success: true, message: "Agent declined successfully" });
+      } catch (error) {
+        res.status(500).send({ success: false, message: "An error occurred" });
+      }
     });
 
     // get verified agents for users
@@ -360,6 +412,71 @@ async function run() {
         .find({ role: "agent", status: "verified" }, { projection })
         .toArray();
       res.send(result);
+    });
+
+    // get total balance of this bank
+    app.get("/v1/totalBalance", async (_, res) => {
+      const result = await userCollection
+        .aggregate([
+          {
+            $group: {
+              _id: null,
+              total: {
+                $sum: "$balance",
+              },
+            },
+          },
+        ])
+        .toArray();
+      res.send(result[0]);
+    });
+
+    // cash request for agent to admin
+
+    app.post("/v1/cashRequest", async (req, res) => {
+      try {
+        const info = req.body;
+        const prevReq = await requestCollection.findOne({
+          agentNumber: info.agentNumber,
+        });
+        if (prevReq) {
+          if (prevReq.status === "pending") {
+            res.send({ success: false, message: "Request already sent" });
+            return;
+          }
+        }
+        const result = await requestCollection.insertOne(info);
+        res.send({ success: true, message: "Request sent successfully" });
+      } catch (error) {
+        res.status(500).send({ success: false, message: "An error occurred" });
+      }
+    });
+
+    // get cash request for admin
+    app.get("/v1/cashRequestsForAdmin", async (req, res) => {
+      const filter = {
+        status: "pending",
+      };
+      const result = await requestCollection.find(filter).toArray();
+      res.send(result);
+    });
+    // accept cash request by admin
+    app.put("/v1/acceptCashRequest/:id", async (req, res) => {
+      try {
+        const { number } = req.body;
+        const id = req.params.id;
+        const update = await userCollection.updateOne(
+          { number: number },
+          { $inc: { balance: 100000 } }
+        );
+        const result = await requestCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { status: "accepted" } }
+        );
+        res.send({ success: true, message: "Request accepted successfully" });
+      } catch (error) {
+        res.send({ success: false, message: "An error occurred" });
+      }
     });
   } finally {
     // Ensures that the client will close when you finish/error

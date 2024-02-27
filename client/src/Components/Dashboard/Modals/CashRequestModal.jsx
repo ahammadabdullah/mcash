@@ -1,13 +1,31 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment } from "react";
+import useAuth from "../../../Hooks/useAuth";
+import { cashRequest } from "../../../lib/apis";
+import toast from "react-hot-toast";
 
 const CashRequestModal = ({
   cashRequestModalOpen,
   setCashRequestModalOpen,
 }) => {
+  const { user } = useAuth();
   function closeModal() {
     setCashRequestModalOpen(false);
   }
+  const handleCashRequest = async () => {
+    const info = {
+      status: "pending",
+      type: "cash",
+      agentNumber: user.number,
+      date: new Date(),
+    };
+    const res = await cashRequest(info);
+    if (res.success === true) {
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
+    }
+  };
   return (
     <Transition appear show={cashRequestModalOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -41,6 +59,20 @@ const CashRequestModal = ({
                 >
                   Request For Cash
                 </Dialog.Title>
+                <div className="flex gap-5  mt-5">
+                  <button
+                    onClick={handleCashRequest}
+                    className="bg-green-500 text-white rounded-md p-2"
+                  >
+                    Submit Request
+                  </button>
+                  <button
+                    className="bg-red-500 text-white rounded-md p-2"
+                    onClick={closeModal}
+                  >
+                    Cancel
+                  </button>
+                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

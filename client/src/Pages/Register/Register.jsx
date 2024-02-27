@@ -15,10 +15,12 @@ const Register = () => {
     const pin = form.pin.value;
     const role = form.role.value;
     const name = form.name.value;
+    const NID = form.NID.value;
     const isValid = regex.test(number);
     const isPinValid = pinRegex.test(pin);
     const userData = {
       name,
+      NID,
       email,
       pin,
       number,
@@ -38,7 +40,6 @@ const Register = () => {
       toast.success("Registration Successful");
       navigate("/dashboard");
     } else {
-      console.log(res.response);
       toast.error(res?.response?.data?.message);
     }
   };
@@ -66,6 +67,14 @@ const Register = () => {
           type="text"
           name="email"
           id="email"
+        />
+        <label htmlFor="NID">NID Number:</label>
+        <input
+          required
+          className="bg-fill p-2 focus:bg-fill ring-0 focus:border-fill rounded-md"
+          type="number"
+          name="NID"
+          id="NID"
         />
         <br />
         <label htmlFor="number">Mobile:</label>

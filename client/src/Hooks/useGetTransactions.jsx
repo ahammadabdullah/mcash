@@ -1,21 +1,19 @@
 import React from "react";
-import { getAllTransactions, getUserTransactions } from "../lib/apis";
+import { getUserTransactions } from "../lib/apis";
 import useAuth from "./useAuth";
 import { useQuery } from "@tanstack/react-query";
 
-const useGetTransactions = () => {
+const useGetTransactions = (number = 0) => {
   const { user } = useAuth();
+  let findingNumber;
+  if (number) {
+    findingNumber = number;
+  } else {
+    findingNumber = user?.number;
+  }
   const { data, refetch } = useQuery({
-    queryKey: ["transactions"],
-    queryFn: async () => {
-      let fetcher;
-      if (user.email === "admin@mcash.com") {
-        fetcher = getAllTransactions();
-      } else {
-        fetcher = getUserTransactions(user.number);
-      }
-      return await fetcher;
-    },
+    queryKey: ["user-transactions"],
+    queryFn: async () => await getUserTransactions(findingNumber),
     enabled: user !== null,
   });
   return [data, refetch];
