@@ -42,13 +42,7 @@ const TransactionHistory = () => {
                   <Table.Cell className="pr-2">
                     ${transaction.amount}
                   </Table.Cell>
-                  <Table.Cell>
-                    {user.email === "admin@mcash.com"
-                      ? `${transaction.type}`
-                      : transaction?.sender === user?.number
-                      ? "Sent"
-                      : "Received"}
-                  </Table.Cell>
+                  <Table.Cell>{transaction.type}</Table.Cell>
                 </Table.Row>
               ))}
           </Table.Body>

@@ -205,7 +205,7 @@ async function run() {
         { $inc: { balance: amount } }
       );
       const adminIncome = await userCollection.updateOne(
-        { email: "admin@mash.com" },
+        { email: "admin@mcash.com" },
         { $inc: { balance: fee } }
       );
       const transactionDetails = {
@@ -222,7 +222,50 @@ async function run() {
 
     // cash out to agents
 
-    app.post("/v1/cashOut", async (req, res) => {});
+    app.post("/v1/cashOut", async (req, res) => {
+      const info = req.body;
+      const amount = parseInt(info.amount);
+      const fee = (amount / 100) * 1.5;
+      const adminFee = (amount / 100) * 0.5;
+      const agentFee = (amount / 100) * 1;
+      const sender = await userCollection.findOne({ number: info.userNumber });
+      const agent = await userCollection.findOne({ number: info.agentNumber });
+      if (sender.pin !== info.pin) {
+        res.send({ success: false, message: "Wrong pin" });
+        return;
+      }
+      if (sender.balance < info.amount) {
+        res.send({ success: false, message: "Insufficient balance" });
+        return;
+      }
+      if (agent.role !== "agent") {
+        res.send({ success: false, message: "Agent not found" });
+        return;
+      }
+      const sent = await userCollection.updateOne(
+        { number: info.userNumber },
+        { $inc: { balance: -(amount + fee) } }
+      );
+      const received = await userCollection.updateOne(
+        { number: info.agentNumber },
+        { $inc: { balance: amount, income: agentFee } }
+      );
+
+      const adminIncome = await userCollection.updateOne(
+        { email: "admin@mcash.com" },
+        { $inc: { balance: adminFee } }
+      );
+      const transactionDetails = {
+        sender: info.userNumber,
+        receiver: info.agentNumber,
+        amount: info.amount,
+        date: new Date(),
+        type: "cash out",
+      };
+      const result = await transactionCollection.insertOne(transactionDetails);
+      res.send({ success: true, message: "Cash out successful" });
+    });
+
     // get user transaction details
     app.get("/v1/userTransactions/:number", async (req, res) => {
       const userNumber = req.params.number;
@@ -231,6 +274,7 @@ async function run() {
       };
       const result = await transactionCollection
         .find(filter)
+        .sort({ _id: -1 })
         .limit(100)
         .toArray();
       res.send(result);

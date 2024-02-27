@@ -3,10 +3,16 @@ import React, { Fragment, useState } from "react";
 import getAgents from "../../../Hooks/getAgents";
 import useAuth from "../../../Hooks/useAuth";
 import { cashOut } from "../../../lib/apis";
+import toast from "react-hot-toast";
+import useGetUserInfos from "../../../Hooks/useGetUserInfos";
+import useGetTransactions from "../../../Hooks/useGetTransactions";
 
 const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
   const [fee, setFee] = useState(0);
   const [agents, refetch] = getAgents();
+  const [data, balanceRefetch] = useGetUserInfos();
+  const [transactions, transactionRefetch] = useGetTransactions();
+
   const { user } = useAuth();
   function closeModal() {
     setCashOutModalOpen(false);
@@ -32,7 +38,14 @@ const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
       userNumber: user.number,
     };
     const res = await cashOut(info);
+    if (res.success === true) {
+      toast.success(res.message);
+    } else {
+      toast.error(res.message);
+    }
     console.log(res);
+    balanceRefetch();
+    transactionRefetch();
   };
   return (
     <Transition appear show={cashOutModalOpen} as={Fragment}>

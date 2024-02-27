@@ -11,6 +11,7 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
     setSendMoneyModalOpen(false);
     setFee(0);
   }
+  // TODO: minimum sent amount is 50 tk.
   const handleSendMoney = async (e) => {
     e.preventDefault();
     const amount = e.target.amount.value;
