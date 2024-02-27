@@ -6,14 +6,28 @@ import { AiOutlineBars } from "react-icons/ai";
 import { BsGraphUp } from "react-icons/bs";
 import { FaHome, FaUser } from "react-icons/fa";
 import MenuItem from "./MenuItem";
+import useAuth from "../../Hooks/useAuth";
+import toast from "react-hot-toast";
+import { RiPassPendingFill } from "react-icons/ri";
 
 const SideBar = () => {
   const [isActive, setActive] = useState(false);
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   // Sidebar Responsive Handler
   const handleToggle = () => {
     setActive(!isActive);
+  };
+
+  const handleLogout = async () => {
+    const res = await logout(user?.number);
+    if (res.success === true) {
+      toast.success("Logout Successful");
+      navigate("/");
+    } else {
+      toast.error(res?.response?.data?.message);
+    }
   };
   return (
     <div>
@@ -57,8 +71,18 @@ const SideBar = () => {
             <span onClick={() => setActive(!isActive)}>
               <MenuItem icon={FaUser} label="Dashboard" address="/dashboard" />
             </span>
+            <span onClick={() => setActive(!isActive)}>
+              <MenuItem
+                icon={RiPassPendingFill}
+                label="Requests"
+                address="/dashboard/requests"
+              />
+            </span>
 
-            <button className="flex w-full items-center px-4 py-2 mt-5 text-gray-600 hover:bg-gray-300   hover:text-gray-700 transition-colors duration-300 transform">
+            <button
+              onClick={handleLogout}
+              className="flex w-full items-center px-4 py-2 mt-5 text-gray-600 hover:bg-gray-300   hover:text-gray-700 transition-colors duration-300 transform"
+            >
               <GrLogout className="w-5 h-5" />
 
               <span className="mx-4 font-medium">Logout</span>

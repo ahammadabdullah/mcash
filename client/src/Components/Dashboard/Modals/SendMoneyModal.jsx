@@ -1,14 +1,38 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
+import useAuth from "../../../Hooks/useAuth";
+import { sendMoney } from "../../../lib/apis";
+import toast from "react-hot-toast";
 
 const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
   const [fee, setFee] = useState(0);
+  const { user } = useAuth();
   function closeModal() {
     setSendMoneyModalOpen(false);
     setFee(0);
   }
-  const handleSendMoney = () => {
-    console.log("Sending Money...");
+  const handleSendMoney = async (e) => {
+    e.preventDefault();
+    const amount = e.target.amount.value;
+    const receiver = e.target.recipientNumber.value;
+    const pin = e.target.pin.value;
+    const info = {
+      sender: user.number,
+      amount,
+      receiver,
+      pin,
+    };
+    if (user.number === receiver) {
+      toast.error("You can't send money to yourself");
+      return;
+    }
+    const res = await sendMoney(info);
+    if (res.success === true) {
+      toast.success("Money sent successfully");
+    } else {
+      toast.error(res.message);
+    }
+    console.log(res);
   };
   const handleFee = (e) => {
     const amount = e.target.value;
@@ -51,7 +75,7 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
                 >
                   Send Money
                 </Dialog.Title>
-                <form className="space-y-3  my-5">
+                <form onSubmit={handleSendMoney} className="space-y-3  my-5">
                   <label className="text-sm" htmlFor="recipientNumber">
                     Enter Recipient Number:
                   </label>
@@ -93,17 +117,16 @@ const SendMoneyModal = ({ sendMoneyModalOpen, setSendMoneyModalOpen }) => {
                     name="pin"
                     id="pin"
                   />
+                  <div className="mt-4">
+                    <button
+                      type="submit"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={closeModal}
+                    >
+                      Send
+                    </button>
+                  </div>
                 </form>
-
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    onClick={closeModal}
-                  >
-                    Send
-                  </button>
-                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>

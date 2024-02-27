@@ -1,7 +1,9 @@
 import { useState } from "react";
+import useGetUserInfos from "../../Hooks/useGetUserInfos";
 
 const BalanceCard = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [data] = useGetUserInfos();
 
   const handleClick = () => {
     setIsVisible(!isVisible);
@@ -22,7 +24,7 @@ const BalanceCard = () => {
           } `}
           onClick={handleClick}
         >
-          500
+          {data?.balance}
         </div>
       </div>
     </div>

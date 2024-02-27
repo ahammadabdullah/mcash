@@ -26,11 +26,20 @@ const QuickActions = () => {
           >
             Cash Out
           </button>
+
           <button
             onClick={() => setCashInModalOpen(!cashInModalOpen)}
             className="w-[100px] bg-green-500 text-white p-2 rounded-lg"
           >
             Cash in
+          </button>
+          {/* cash request for agent */}
+          <button className="w-[100px] bg-green-500 text-white p-2 rounded-lg">
+            Cash Request
+          </button>
+          {/* withdraw request for agent */}
+          <button className="w-[100px] bg-green-500 text-white p-2 rounded-lg">
+            Withdraw Request
           </button>
         </div>
       </div>

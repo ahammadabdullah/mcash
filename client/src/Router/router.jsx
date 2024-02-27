@@ -6,6 +6,7 @@ import Home from "../Pages/Home/Home";
 import Dashboard from "../Layouts/Dashboard";
 import Register from "../Pages/Register/Register";
 import Profile from "../Pages/Dashboard/Profile";
+import Requests from "../Pages/Dashboard/Requests";
 
 const router = createBrowserRouter([
   {
@@ -35,8 +36,8 @@ const router = createBrowserRouter([
         element: <Profile />,
       },
       {
-        path: "settings",
-        element: <div>Dashboard Settings</div>,
+        path: "requests",
+        element: <Requests />,
       },
     ],
   },
