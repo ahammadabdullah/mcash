@@ -31,11 +31,9 @@ const SideBar = () => {
     <div>
       <>
         {/* Small Screen Navbar */}
-        <div className="bg-blue-100 h-20 text-gray-800 flex justify-between md:hidden">
-          <div>
-            <div className="block !w-20 cursor-pointer p-4 font-bold">
-              <h3>M-Cash</h3>
-            </div>
+        <div className="bg-blue-100 h-20 text-gray-800 flex items-center justify-between md:hidden">
+          <div className="block !w-28 cursor-pointer p-4 font-bold">
+            <h3>M-Cash</h3>
           </div>
 
           <button
@@ -52,6 +50,9 @@ const SideBar = () => {
           }  md:translate-x-0  transition duration-200 ease-in-out`}
         >
           <div>
+            <div className="block !w-28 cursor-pointer p-4 font-bold">
+              <h3>M-Cash</h3>
+            </div>
             <div>
               <div className="w-full hidden md:flex px-4 py-2 shadow-lg rounded-lg justify-center items-center bg-blue-200 mx-auto">
                 <h3>M-Cash</h3>
