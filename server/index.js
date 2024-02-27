@@ -438,6 +438,7 @@ async function run() {
         const info = req.body;
         const prevReq = await requestCollection.findOne({
           agentNumber: info.agentNumber,
+          type: "cash",
         });
         if (prevReq) {
           if (prevReq.status === "pending") {
@@ -456,6 +457,7 @@ async function run() {
     app.get("/v1/cashRequestsForAdmin", async (req, res) => {
       const filter = {
         status: "pending",
+        type: "cash",
       };
       const result = await requestCollection.find(filter).toArray();
       res.send(result);
@@ -468,6 +470,69 @@ async function run() {
         const update = await userCollection.updateOne(
           { number: number },
           { $inc: { balance: 100000 } }
+        );
+        const result = await requestCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { status: "accepted" } }
+        );
+        res.send({ success: true, message: "Request accepted successfully" });
+      } catch (error) {
+        res.send({ success: false, message: "An error occurred" });
+      }
+    });
+
+    // withdraw request by agent
+    app.post("/v1/withdrawRequest", async (req, res) => {
+      const incomingInfo = req.body;
+      const sender = await userCollection.findOne({
+        number: incomingInfo.agentNumber,
+      });
+
+      if (sender.pin !== incomingInfo.pin) {
+        res.send({ success: false, message: "Wrong pin" });
+        return;
+      }
+      const prevReq = await requestCollection.findOne({
+        agentNumber: incomingInfo.agentNumber,
+        type: "withdraw",
+      });
+      if (prevReq) {
+        if (prevReq.status === "pending") {
+          res.send({ success: false, message: "Request already sent" });
+          return;
+        }
+      }
+      if (sender.balance < incomingInfo.balance) {
+        res.send({ success: false, message: "Insufficient balance" });
+        return;
+      }
+      const info = {
+        status: "pending",
+        type: "withdraw",
+        agentNumber: incomingInfo.agentNumber,
+        amount: incomingInfo.amount,
+        date: incomingInfo.date,
+      };
+      const result = await requestCollection.insertOne(info);
+      res.send({ success: true, message: "Request sent successfully" });
+    });
+    // get withdraw request for admin
+    app.get("/v1/withdrawRequests", async (req, res) => {
+      const filter = {
+        status: "pending",
+        type: "withdraw",
+      };
+      const result = await requestCollection.find(filter).toArray();
+      res.send(result);
+    });
+    // accept withdraw request by admin
+    app.put("/v1/acceptWithdrawRequest/:id", async (req, res) => {
+      try {
+        const { agentNumber, amount } = req.body;
+        const id = req.params.id;
+        const update = await userCollection.updateOne(
+          { number: agentNumber },
+          { $inc: { balance: -amount } }
         );
         const result = await requestCollection.updateOne(
           { _id: new ObjectId(id) },

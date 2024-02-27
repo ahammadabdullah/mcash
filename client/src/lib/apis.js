@@ -96,3 +96,21 @@ export const acceptCashRequest = async (id, agentNumber) => {
   });
   return data;
 };
+
+export const withDrawRequest = async (info) => {
+  const { data } = await axiosSecure.post("/withDrawRequest", info);
+  return data;
+};
+
+export const getWithdrawRequest = async () => {
+  const { data } = await axiosSecure.get("/withdrawRequests");
+  return data;
+};
+
+export const acceptWithdrawRequest = async (id, amount, agentNumber) => {
+  const { data } = await axiosSecure.put(`/acceptWithdrawRequest/${id}`, {
+    amount,
+    agentNumber,
+  });
+  return data;
+};
