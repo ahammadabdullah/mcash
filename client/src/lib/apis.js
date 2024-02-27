@@ -55,3 +55,8 @@ export const getVerifiedAgent = async () => {
   const { data } = await axiosSecure.get("/verifiedAgents");
   return data;
 };
+
+export const cashOut = async (info) => {
+  const { data } = await axiosSecure.post("/cashOut", info);
+  return data;
+};

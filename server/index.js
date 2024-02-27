@@ -219,6 +219,10 @@ async function run() {
       res.send({ success: true, message: "Money sent successfully" });
       console.log(result);
     });
+
+    // cash out to agents
+
+    app.post("/v1/cashOut", async (req, res) => {});
     // get user transaction details
     app.get("/v1/userTransactions/:number", async (req, res) => {
       const userNumber = req.params.number;

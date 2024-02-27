@@ -33,7 +33,7 @@ const AgentRequest = () => {
     <div>
       <Container title={`Agent Request ${data?.length}`}>
         <div className="overflow-x-auto my-5">
-          {data.length !== 0 ? (
+          {data?.length !== 0 ? (
             <Table>
               <Table.Head>
                 <Table.HeadCell>Name</Table.HeadCell>

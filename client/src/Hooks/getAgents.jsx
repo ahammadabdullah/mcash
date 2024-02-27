@@ -7,7 +7,7 @@ const getAgents = () => {
     queryKey: ["agents"],
     queryFn: async () => await getVerifiedAgent(),
   });
-  return [];
+  return [data, refetch];
 };
 
 export default getAgents;

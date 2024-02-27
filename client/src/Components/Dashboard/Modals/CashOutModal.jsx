@@ -1,32 +1,39 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, useState } from "react";
+import getAgents from "../../../Hooks/getAgents";
+import useAuth from "../../../Hooks/useAuth";
+import { cashOut } from "../../../lib/apis";
 
 const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
   const [fee, setFee] = useState(0);
+  const [agents, refetch] = getAgents();
+  const { user } = useAuth();
   function closeModal() {
     setCashOutModalOpen(false);
     setFee(0);
   }
-  const handleCashOut = () => {
-    console.log("Sending Money...");
-  };
+
   const handleFee = (e) => {
     const amount = e.target.value;
     const fee = (amount / 100) * 1.5;
     setFee(fee);
   };
-  const agents = [
-    { name: "John Doe", number: "01830845302" },
-    { name: "Jane Doe", number: "02983890345" },
-    { name: "Alice Smith", number: "01712345678" },
-    { name: "Bob Johnson", number: "01987654321" },
-    { name: "Emily Williams", number: "01654321098" },
-    { name: "David Miller", number: "01512345678" },
-    { name: "Sarah Jones", number: "01478901234" },
-    { name: "Michael Brown", number: "01356789012" },
-    { name: "Jennifer Garcia", number: "01234567890" },
-    { name: "Charles Anderson", number: "01112345678" },
-  ];
+
+  const handleCashOut = async (e) => {
+    e.preventDefault();
+    console.log("Cash Out");
+    const amount = e.target.amount.value;
+    const agentNumber = e.target.agent.value;
+    const pin = e.target.pin.value;
+    const info = {
+      amount,
+      agentNumber,
+      pin,
+      userNumber: user.number,
+    };
+    const res = await cashOut(info);
+    console.log(res);
+  };
   return (
     <Transition appear show={cashOutModalOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={closeModal}>
@@ -60,16 +67,17 @@ const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
                 >
                   Cash Out
                 </Dialog.Title>
-                <form className="space-y-3  my-5">
+                <form className="space-y-3  my-5" onSubmit={handleCashOut}>
                   <label className="text-sm" htmlFor="agent">
                     Select Your Agent:
                   </label>
                   <br />
                   <select
                     className="rounded-md border border-gray-300 p-2 !mt-0"
+                    name="agent"
                     id="agent"
                   >
-                    {agents.map((agent, index) => (
+                    {agents?.map((agent, index) => (
                       <option key={index} value={agent.number}>
                         {agent.name} - {agent.number}
                       </option>
@@ -107,17 +115,16 @@ const CashOutModal = ({ setCashOutModalOpen, cashOutModalOpen }) => {
                     name="pin"
                     id="pin"
                   />
+                  <div className="mt-4">
+                    <button
+                      type="submit"
+                      className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      onClick={closeModal}
+                    >
+                      Cash Out
+                    </button>
+                  </div>
                 </form>
-
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                    onClick={closeModal}
-                  >
-                    Cash Out
-                  </button>
-                </div>
               </Dialog.Panel>
             </Transition.Child>
           </div>
