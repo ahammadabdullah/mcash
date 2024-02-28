@@ -7,16 +7,30 @@ const cookieParser = require("cookie-parser");
 const port = process.env.PORT || 3000;
 
 const app = express();
-app.use(
-  cors({
-    origin: ["http://localhost:5173"],
-    credentials: true,
-  })
-);
+
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: ["https://mcash-3bd0b.web.app", "http://localhost:5173"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Origin",
+      "X-Requested-With",
+      "Content-Type",
+      "Accept",
+      "Authorization",
+      "Access-Control-Allow-Headers",
+    ],
+  })
+);
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:5173");
+  res.header(
+    "Access-Control-Allow-Origin",
+    "http://localhost:5173",
+    "https://mcash-3bd0b.web.app"
+  );
   res.header("Access-Control-Allow-Credentials", "true");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
   res.header(
@@ -106,49 +120,57 @@ async function run() {
 
     // login api
     app.put("/v1/login", async (req, res) => {
-      const { number, pin } = req.body;
-      const user = await userCollection.findOne({ number });
-      if (user) {
-        if (user.isLoggedIn === true) {
-          res
-            .status(400)
-            .send({ success: false, message: "User already logged in" });
-          return;
-        }
-        if (user.status === "blocked") {
-          res.send({ success: false, message: "User is blocked" });
-          return;
-        }
-        if (user.status === "pending") {
-          res.send({ success: false, message: "User is not verified yet" });
-        }
-        if (user.pin === pin) {
-          const result = await userCollection.updateOne(
-            { number },
-            { $set: { isLoggedIn: true } }
-          );
-          const token = jwt.sign(
-            { number: user.number, role: user.role },
-            process.env.secretKey,
-            {
-              expiresIn: "1h",
-            }
-          );
-          res
-            .status(200)
-            .cookie("token", token, {
-              httpOnly: true,
-              secure: true,
-              sameSite: "none",
-            })
-            .send({ success: true, message: "Login successful" });
+      try {
+        const { number, pin } = req.body;
+        const user = await userCollection.findOne({ number });
+        if (user) {
+          if (user.isLoggedIn === true) {
+            res
+              .status(400)
+              .send({ success: false, message: "User already logged in" });
+            return;
+          }
+          if (user.status === "blocked") {
+            res.send({ success: false, message: "User is blocked" });
+            return;
+          }
+          if (user.status === "pending") {
+            res.send({ success: false, message: "Agent is not verified yet" });
+            return;
+          }
+          if (user.pin === pin) {
+            const token = jwt.sign(
+              { number: user.number, role: user.role },
+              process.env.secretKey,
+              {
+                expiresIn: "24h",
+              }
+            );
+
+            res
+              .status(200)
+              .cookie("token", token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: "none",
+              })
+              .send({ success: true, message: "Login successful" });
+            const result = await userCollection.updateOne(
+              { number },
+              { $set: { isLoggedIn: true } }
+            );
+          } else {
+            res
+              .status(400)
+              .send({ success: false, message: "Wrong Credentials" });
+          }
         } else {
           res
             .status(400)
             .send({ success: false, message: "Wrong Credentials" });
         }
-      } else {
-        res.status(400).send({ success: false, message: "Wrong Credentials" });
+      } catch (error) {
+        res.send({ success: false, message: "Something went wrong" });
       }
     });
     // logout api
@@ -167,24 +189,27 @@ async function run() {
         .status(200)
         .send({ success: true, message: "Logout successful" });
     });
-
-    // get user by number api
+    // get user by number api PUBLIC
     app.get("/v1/users/:number", async (req, res) => {
-      const projection = {
-        pin: 0,
-      };
-      const result = await userCollection.findOne(
-        {
-          number: req.params.number,
-        },
-        { projection }
-      );
-      res.status(200).send(result);
+      try {
+        const projection = {
+          pin: 0,
+        };
+        const result = await userCollection.findOne(
+          {
+            number: req.params.number,
+          },
+          { projection }
+        );
+        res.status(200).send(result);
+      } catch (error) {
+        res.send({ success: false, message: "An error occurred" });
+      }
     });
 
     // get all users for admin
 
-    app.get("/v1/allUsers", async (req, res) => {
+    app.get("/v1/allUsers", verifyToken, async (req, res) => {
       const filter = {
         $and: [
           { $or: [{ role: "user" }, { role: "agent" }] },
@@ -203,8 +228,8 @@ async function run() {
     });
 
     // user bblock unblock action for admin
-    try {
-      app.put("/v1/userAction/:id", async (req, res) => {
+    app.put("/v1/userAction/:id", verifyToken, async (req, res) => {
+      try {
         const id = req.params.id;
         const user = await userCollection.findOne({ _id: new ObjectId(id) });
         if (user.status === "verified") {
@@ -222,12 +247,12 @@ async function run() {
           success: true,
           message: "User status updated Successfully",
         });
-      });
-    } catch (error) {
-      res.send({ success: false, message: "Something Went Wrong" });
-    }
+      } catch (error) {
+        res.send({ success: false, message: "Something Went Wrong" });
+      }
+    });
     // send money user to user
-    app.post("/v1/sendMoney", async (req, res) => {
+    app.post("/v1/sendMoney", verifyToken, async (req, res) => {
       const info = req.body;
       let fee = 0;
       const amount = parseInt(info.amount);
@@ -274,7 +299,7 @@ async function run() {
 
     // cash out to agents
 
-    app.post("/v1/cashOut", async (req, res) => {
+    app.post("/v1/cashOut", verifyToken, async (req, res) => {
       const info = req.body;
       const amount = parseInt(info.amount);
       const fee = (amount / 100) * 1.5;
@@ -319,7 +344,7 @@ async function run() {
     });
     // cash in to user
 
-    app.post("/v1/cashIn", async (req, res) => {
+    app.post("/v1/cashIn", verifyToken, async (req, res) => {
       const info = req.body;
       const amount = parseInt(info.amount);
       const agent = await userCollection.findOne({ number: info.agentNumber });
@@ -355,7 +380,7 @@ async function run() {
       res.send({ success: true, message: "Cash in successful" });
     });
     // get user transaction details
-    app.get("/v1/userTransactions/:number", async (req, res) => {
+    app.get("/v1/userTransactions/:number", verifyToken, async (req, res) => {
       const userNumber = req.params.number;
       const filter = {
         $or: [{ sender: userNumber }, { receiver: userNumber }],
@@ -369,12 +394,12 @@ async function run() {
     });
     // get all transaction details
 
-    app.get("/v1/transactions", async (req, res) => {
+    app.get("/v1/transactions", verifyToken, async (req, res) => {
       const result = await transactionCollection.find().toArray();
       res.send(result);
     });
     // get agent requests
-    app.get("/v1/agentRequests", async (req, res) => {
+    app.get("/v1/agentRequests", verifyToken, async (req, res) => {
       const result = await userCollection
         .find({ role: "agent", status: "pending" })
         .toArray();
@@ -382,7 +407,7 @@ async function run() {
     });
 
     // approve agent
-    app.put("/v1/approveAgent/:id", async (req, res) => {
+    app.put("/v1/approveAgent/:id", verifyToken, async (req, res) => {
       try {
         const id = req.params.id;
         const result = await userCollection.updateOne(
@@ -396,7 +421,7 @@ async function run() {
     });
     // decline agent
 
-    app.put("/v1/declineAgent/:id", async (req, res) => {
+    app.put("/v1/declineAgent/:id", verifyToken, async (req, res) => {
       try {
         const id = req.params.id;
         const result = await userCollection.updateOne(
@@ -410,7 +435,7 @@ async function run() {
     });
 
     // get verified agents for users
-    app.get("/v1/verifiedAgents", async (req, res) => {
+    app.get("/v1/verifiedAgents", verifyToken, async (req, res) => {
       const projection = {
         pin: 0,
         balance: 0,
@@ -422,7 +447,7 @@ async function run() {
     });
 
     // get total balance of this bank
-    app.get("/v1/totalBalance", async (_, res) => {
+    app.get("/v1/totalBalance", verifyToken, async (_, res) => {
       const result = await userCollection
         .aggregate([
           {
@@ -440,7 +465,7 @@ async function run() {
 
     // cash request for agent to admin
 
-    app.post("/v1/cashRequest", async (req, res) => {
+    app.post("/v1/cashRequest", verifyToken, async (req, res) => {
       try {
         const info = req.body;
         const prevReq = await requestCollection.findOne({
@@ -461,7 +486,7 @@ async function run() {
     });
 
     // get cash request for admin
-    app.get("/v1/cashRequestsForAdmin", async (req, res) => {
+    app.get("/v1/cashRequestsForAdmin", verifyToken, async (req, res) => {
       const filter = {
         status: "pending",
         type: "cash",
@@ -470,7 +495,7 @@ async function run() {
       res.send(result);
     });
     // accept cash request by admin
-    app.put("/v1/acceptCashRequest/:id", async (req, res) => {
+    app.put("/v1/acceptCashRequest/:id", verifyToken, async (req, res) => {
       try {
         const { number } = req.body;
         const id = req.params.id;
@@ -499,7 +524,7 @@ async function run() {
     });
 
     // withdraw request by agent
-    app.post("/v1/withdrawRequest", async (req, res) => {
+    app.post("/v1/withdrawRequest", verifyToken, async (req, res) => {
       const incomingInfo = req.body;
       const sender = await userCollection.findOne({
         number: incomingInfo.agentNumber,
@@ -534,7 +559,7 @@ async function run() {
       res.send({ success: true, message: "Request sent successfully" });
     });
     // get withdraw request for admin
-    app.get("/v1/withdrawRequests", async (req, res) => {
+    app.get("/v1/withdrawRequests", verifyToken, async (req, res) => {
       const filter = {
         status: "pending",
         type: "withdraw",
@@ -543,7 +568,7 @@ async function run() {
       res.send(result);
     });
     // accept withdraw request by admin
-    app.put("/v1/acceptWithdrawRequest/:id", async (req, res) => {
+    app.put("/v1/acceptWithdrawRequest/:id", verifyToken, async (req, res) => {
       try {
         const { agentNumber, amount } = req.body;
         const id = req.params.id;
@@ -579,6 +604,10 @@ run().catch(console.dir);
 
 app.get("/v1", (req, res) => {
   res.send("First version of this server is running well");
+});
+
+app.get("/", (req, res) => {
+  res.send("Welcome to mCash API");
 });
 
 app.listen(port, () => {

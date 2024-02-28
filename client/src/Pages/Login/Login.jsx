@@ -32,11 +32,11 @@ const Login = () => {
     };
 
     const res = await loginWithNumber(loginInfo);
-    if (res.success === true) {
+    if (res?.success === true) {
       toast.success("Login Successful");
       navigate("/dashboard");
     } else {
-      toast.error(res.response.data.message);
+      toast.error(res?.message);
     }
   };
 

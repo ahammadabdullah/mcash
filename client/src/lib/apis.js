@@ -32,7 +32,7 @@ export const getAllTransactions = async () => {
 };
 
 export const getUserInfos = async (number) => {
-  const { data } = await axiosSecure.get(`/users/${number}`);
+  const { data } = await axiosPublic.get(`/users/${number}`);
   return data;
 };
 

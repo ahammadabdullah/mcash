@@ -17,12 +17,14 @@ const BalanceCard = () => {
         <h3 className="">Total Balance: </h3>
         <div className="relative py-1 px-2 ">
           <div
-            className={`absolute inset-0 bg-gray-300 opacity-100 backdrop-blur-3xl blur-2 filter grayscale pointer-events-none  rounded-lg  ${
+            title="Click to show/hide the total balance"
+            onClick={handleClick}
+            className={`cursor-pointer absolute inset-0 glass z-10   rounded-lg  ${
               isVisible ? "hidden" : ""
             }`}
           />
           <div
-            className={`text-3xl font-bold cursor-pointer ${
+            className={`text-3xl font-bold  cursor-pointer ${
               isVisible ? "opacity-100" : "opacity-20"
             } `}
             onClick={handleClick}
@@ -38,7 +40,9 @@ const BalanceCard = () => {
           <h3>Total Income: </h3>
           <div className="relative py-1 px-2 ">
             <div
-              className={`absolute inset-0 bg-gray-300 opacity-100 backdrop-blur-3xl blur-2 filter grayscale pointer-events-none  rounded-lg  ${
+              title="Click to show/hide the total balance"
+              onClick={handleClick}
+              className={`cursor-pointer absolute inset-0 glass z-10   rounded-lg  ${
                 isVisible ? "hidden" : ""
               }`}
             />
@@ -48,7 +52,11 @@ const BalanceCard = () => {
               } `}
               onClick={handleClick}
             >
-              {user?.email === "admin@mcash.com" ? user?.balance : user?.income}
+              {user?.email === "admin@mcash.com"
+                ? user?.balance
+                : user?.income === undefined
+                ? "0"
+                : user?.income}
             </div>
           </div>
         </div>
