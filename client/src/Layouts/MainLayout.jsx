@@ -11,7 +11,7 @@ const MainLayout = () => {
       <NavBar />
       <div
         className="flex justify-end items-center"
-        style={{ height: "calc(100vh - 50px)" }}
+        style={{ height: "calc(100vh - 51px)" }}
       >
         <div className="lg:w-[40%] w-full">
           <Outlet />
